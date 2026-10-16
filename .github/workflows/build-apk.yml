@@ -12,6 +12,9 @@ jobs:
           distribution: temurin
           java-version: '25'
 
+      - name: Configure Gradle memory
+        run: echo "org.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8" > gradle.properties
+
       - uses: gradle/actions/setup-gradle@v5
 
       - name: Build APK
