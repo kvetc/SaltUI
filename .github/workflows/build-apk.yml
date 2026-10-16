@@ -14,9 +14,22 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v5
 
-      - run: ./gradlew androidApp:assembleDebug
+      - name: Build APK
+        shell: bash
+        run: |
+          set +e
+          ./gradlew androidApp:assembleDebug --stacktrace > build.log 2>&1
+          CODE=$?
+          if [ $CODE -ne 0 ]; then
+            echo '#### 构建失败，错误信息：' >> "$GITHUB_STEP_SUMMARY"
+            echo '```text' >> "$GITHUB_STEP_SUMMARY"
+            tail -n 80 build.log >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          fi
+          exit $CODE
 
       - uses: actions/upload-artifact@v4
+        if: success()
         with:
           name: saltui-demo-apk
           path: androidApp/build/outputs/apk/debug/*.apk
